@@ -1,0 +1,4 @@
+与v1.0相比，做了如下修改：
+1）修改了LoginWindow和RegisterWindow只能打开一次的Bug；
+2）解决了ChatWindow和GroupWindow的对话框自动下滑问题；
+3）修正了由于邀请不存在或者不在线用户进行群聊所导致的Exception。
