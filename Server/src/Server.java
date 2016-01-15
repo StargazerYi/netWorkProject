@@ -3,33 +3,27 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.InetSocketAddress;
-
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.Properties;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import java.util.*;
 import java.sql.*;
 
-import javax.net.ssl.*;
+import java.io.FileInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.security.KeyStore;
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
 
-import auth.Auth;
-import config.Configuration;
-
-public class Server {
+public class Server {	
 	private static boolean flag = false;
+	private static String SERVER_KEY_STORE = "../certificate/server_ks";  
+    private static String SERVER_KEY_STORE_PASSWORD = "123123";
 
-	private static SSLContext sslContext;  
-    private static SSLServerSocketFactory sslServerSocketFactory;  
-    private static SSLServerSocket sslServerSocket;
-
-    public static Properties p = Configuration.getConfig();
-    Integer authority = Integer.valueOf(p.getProperty("authority"));
-	public static void main(String[] args)throws Exception{
+	public static void main(String[] args) throws Exception {
 		startServ();
 		System.out.println("Server listening......");
 		int port = 5556;
@@ -40,37 +34,29 @@ public class Server {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-
 		port = 5555;
-		//ServerSocket serverSocket = null;
 
+		ServerSocket serverSocket = null;
 
-  
+		System.setProperty("javax.net.ssl.trustStore", SERVER_KEY_STORE);
+		SSLContext context = SSLContext.getInstance("TLS");
+		
+		KeyStore ks = KeyStore.getInstance("jceks");
+		ks.load(new FileInputStream(SERVER_KEY_STORE), null);
+		KeyManagerFactory kf = KeyManagerFactory.getInstance("SunX509");
+		kf.init(ks, SERVER_KEY_STORE_PASSWORD.toCharArray());
+		
+		context.init(kf.getKeyManagers(), null, null);
 
+		ServerSocketFactory factory = context.getServerSocketFactory();
+		serverSocket = factory.createServerSocket(port);
+		((SSLServerSocket) serverSocket).setNeedClientAuth(false);
 
-		try {
-			//sslServerSocket = new ServerSocket(port);
-
-			//serverSocket
-		sslContext = Auth.getSSLContext();
-        sslServerSocketFactory = sslContext.getServerSocketFactory();
-
-        sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket();   
-        String[] pwdsuits = sslServerSocket.getSupportedCipherSuites();  
-        sslServerSocket.setEnabledCipherSuites(pwdsuits);  
-        sslServerSocket.setReuseAddress(true);
-
-        sslServerSocket.setUseClientMode(false);  
-
-
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		SSLSocket clientSocket = null;
+		Socket clientSocket = null;
 		while(flag){
-			//禄帽碌脙驴脥禄搂露脣脟毛脟贸
+			//获得客户端请求
 			try {
-				clientSocket = (SSLSocket)sslServerSocket.accept();
+				clientSocket = serverSocket.accept();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

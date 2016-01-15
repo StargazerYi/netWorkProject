@@ -20,19 +20,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.*;
-import javax.net.ssl.*;
-import javax.net.*;
 
 import net.sf.json.JSONObject;
 
 public class ClientThread implements Runnable {
 	public static String content = null;
-    private SSLSocket clientSocket = null;
+    private Socket clientSocket = null;
     private BufferedReader br = null;
     private Writer out = null;
     private dbManage dbManager = dbManage.getInstance();
     private JSONObject test = null;
-    public ClientThread(SSLSocket s)
+    public ClientThread(Socket s)
     {
          try
          {
