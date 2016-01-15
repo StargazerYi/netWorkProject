@@ -1,0 +1,4 @@
+关于如何运行
+1.打开src/data中的Data.java，将其中serverIP变量所存的ip地址改为服务端的ip地址（*请确保服务端已事先运行）
+2.运行build.bat
+3.运行run.bat
